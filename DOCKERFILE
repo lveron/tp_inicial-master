@@ -1,0 +1,28 @@
+# Usar imagen oficial de Python
+FROM python:3.11-slim
+
+# Establecer directorio de trabajo
+WORKDIR /app
+
+# Copiar requirements
+COPY requirements.txt .
+
+# Instalar dependencias del sistema necesarias para deepface y headless opencv
+RUN apt-get update && apt-get install -y \
+    libglib2.0-0 \
+    libsm6 \
+    libxrender1 \
+    libxext6 \
+ && rm -rf /var/lib/apt/lists/*
+
+# Instalar dependencias de Python
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copiar todo el proyecto
+COPY . .
+
+# Exponer puerto (el que usa FastAPI/uvicorn)
+EXPOSE 8000
+
+# Comando por defecto para correr la app
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
