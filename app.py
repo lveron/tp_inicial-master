@@ -10,6 +10,7 @@ from flask_cors import CORS
 from generarEmbedinng import generar_embedding
 from persistencia.registrarAsistencia import RegistrarAsistencias
 from reconocimiento.verificador import reconocer_empleado
+from tensorflow import keras
 from validarEmpleado.validarLegajo import ValidadorLegajo
 from validarEmpleado.validarTurno import ValidadorTurno
 import cv2
