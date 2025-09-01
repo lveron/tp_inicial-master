@@ -2,6 +2,9 @@
 import datetime
 from datetime import datetime
 
+import sys
+import keras
+sys.modules["tensorflow.keras"] = keras
 from deepface import DeepFace
 from flask_cors import CORS
 from flask import Flask, request, jsonify
