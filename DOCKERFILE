@@ -1,18 +1,35 @@
+# Imagen base liviana
 FROM python:3.11-slim
 
-# Instalar librerías del sistema necesarias para OpenCV y DeepFace
-RUN apt-get update && apt-get install -y \
+# Evita .pyc y buffer
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    # silencia warnings ruidosos de TF (opcional)
+    TF_CPP_MIN_LOG_LEVEL=2
+
+# Paquetes del sistema que OpenCV/DeepFace necesitan
+# libGL resuelve el error libGL.so.1
+# libglib y X libs evitan otros errores de carga
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libglib2.0-0 \
- && rm -rf /var/lib/apt/lists/*
+    libsm6 \
+    libxext6 \
+    libxrender1 \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
+# Instala deps python primero (mejor cache)
 COPY requirements.txt .
-
-RUN pip install --no-cache-dir --upgrade pip \
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel \
  && pip install --no-cache-dir -r requirements.txt
 
+# Copia el código
 COPY . .
 
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
+# Para correr localmente (en plataformas PaaS usan $PORT)
+EXPOSE 8000
+
+# Usa $PORT si está definido por la plataforma
+CMD ["bash", "-lc", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-8000}"]
