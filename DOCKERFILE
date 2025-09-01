@@ -1,27 +1,18 @@
 FROM python:3.11-slim
 
-# Instalar dependencias de sistema
+# Instalar librerías del sistema necesarias para OpenCV y DeepFace
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
-    libsm6 \
-    libxrender1 \
-    libxext6 \
-    && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/*
 
-# Crear carpeta de la app
 WORKDIR /app
 
-# Copiar requirements
 COPY requirements.txt .
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
 
-# Copiar código
+RUN pip install --no-cache-dir --upgrade pip \
+ && pip install --no-cache-dir -r requirements.txt
+
 COPY . .
 
-# Puerto de Railway
-ENV PORT 8000
-
-# Comando para ejecutar la app
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
