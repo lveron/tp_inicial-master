@@ -5,13 +5,11 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Instala las dependencias del sistema operativo que tu aplicación necesita.
-# 'libgl1-mesa-glx' es la que faltaba y causaba el error.
-RUN apt-get update && apt-get install -y libgl1-mesa-glx
-
-# Opcional: Si tienes un archivo apt-packages.txt, puedes usar esta línea
-# para instalar múltiples dependencias de sistema.
-# COPY apt-packages.txt .
-# RUN apt-get update && xargs apt-get install -y < apt-packages.txt
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libsm6 \
+    libxext6 \
+    libxrender1
 
 # Copia los archivos de tu proyecto al directorio de trabajo.
 COPY . .
@@ -20,5 +18,4 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Define el comando que se ejecutará al iniciar el contenedor.
-# Esto es opcional si ya usas un Procfile, pero es una buena práctica.
-CMD [ "python", "app.py" ]
+CMD [ "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000" ]
