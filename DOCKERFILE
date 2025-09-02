@@ -1,39 +1,24 @@
-# Imagen base liviana
+# Usa una imagen base de Python.
 FROM python:3.11-slim
 
-# Evita .pyc y buffer
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    # silencia warnings ruidosos de TF (opcional)
-    TF_CPP_MIN_LOG_LEVEL=2
-
-# Paquetes del sistema que OpenCV/DeepFace necesitan
-# libGL resuelve el error libGL.so.1
-# libglib y X libs evitan otros errores de carga
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgl1 \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender1 \
-    && rm -rf /var/lib/apt/lists/*
-
+# Establece el directorio de trabajo dentro del contenedor.
 WORKDIR /app
 
 # Instala las dependencias del sistema operativo que tu aplicación necesita.
+# 'libgl1-mesa-glx' es la que faltaba y causaba el error.
 RUN apt-get update && apt-get install -y libgl1-mesa-glx
 
-# Instala deps python primero (mejor cache)
-COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel \
- && pip install --no-cache-dir -r requirements.txt
+# Opcional: Si tienes un archivo apt-packages.txt, puedes usar esta línea
+# para instalar múltiples dependencias de sistema.
+# COPY apt-packages.txt .
+# RUN apt-get update && xargs apt-get install -y < apt-packages.txt
 
-# Copia el código
+# Copia los archivos de tu proyecto al directorio de trabajo.
 COPY . .
 
-# Para correr localmente (en plataformas PaaS usan $PORT)
-EXPOSE 8000
+# Instala las librerías de Python desde requirements.txt.
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Usa $PORT si está definido por la plataforma
-CMD ["bash", "-lc", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-8000}"]
-
+# Define el comando que se ejecutará al iniciar el contenedor.
+# Esto es opcional si ya usas un Procfile, pero es una buena práctica.
+CMD [ "python", "app.py" ]
