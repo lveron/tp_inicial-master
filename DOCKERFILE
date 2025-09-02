@@ -20,6 +20,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
+# Instala las dependencias del sistema operativo que tu aplicación necesita.
+RUN apt-get update && apt-get install -y libgl1-mesa-glx
+
 # Instala deps python primero (mejor cache)
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel \
@@ -33,3 +36,4 @@ EXPOSE 8000
 
 # Usa $PORT si está definido por la plataforma
 CMD ["bash", "-lc", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-8000}"]
+
