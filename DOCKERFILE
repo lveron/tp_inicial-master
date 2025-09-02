@@ -1,22 +1,26 @@
-# Usa una imagen base de Python.
-FROM python:3.11
+# Usa una imagen base de Python más completa, basada en Debian.
+FROM python:3.11-slim-buster
 
-# Establece el directorio de trabajo dentro del contenedor.
-WORKDIR /app
-
-# Instala las dependencias del sistema operativo que tu aplicación necesita.
+# Actualiza los paquetes e instala todas las dependencias de sistema necesarias para OpenCV.
 RUN apt-get update && apt-get install -y \
     libgl1-mesa-glx \
     libsm6 \
     libxext6 \
-    libxrender1
+    libxrender1 \
+    ffmpeg \
+    libgtk2.0-0 \
+    libavcodec-dev \
+    libavformat-dev \
+    libswscale-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev
+
+# Establece el directorio de trabajo dentro del contenedor.
+WORKDIR /app
 
 # Copia los archivos de tu proyecto al directorio de trabajo.
 COPY . .
 
 # Instala las librerías de Python desde requirements.txt.
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Define el comando que se ejecutará al iniciar el contenedor.
-CMD [ "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000" ]
-
