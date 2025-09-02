@@ -4,15 +4,9 @@ FROM deepface/deepface:latest
 # Establece el directorio de trabajo dentro del contenedor.
 WORKDIR /app
 
-# Copia el archivo de requisitos.
-COPY requirements.txt .
-
-# Instala las librerías de Python desde requirements.txt.
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copia el resto de tus archivos de proyecto.
+# Copia todos los archivos de tu proyecto al contenedor.
+# No es necesario copiar requirements.txt si ya lo tiene la imagen.
 COPY . .
 
 # Define el comando que se ejecutará al iniciar el contenedor.
-# Es muy probable que tu app.py sea el punto de entrada.
 CMD ["python", "app.py"]
