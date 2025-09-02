@@ -1,26 +1,18 @@
-# Usa una imagen base de Python más completa, basada en Debian.
-FROM python:3.11-slim-buster
-
-# Actualiza los paquetes e instala todas las dependencias de sistema necesarias para OpenCV.
-RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
-    libsm6 \
-    libxext6 \
-    libxrender1 \
-    ffmpeg \
-    libgtk2.0-0 \
-    libavcodec-dev \
-    libavformat-dev \
-    libswscale-dev \
-    libjpeg-dev \
-    libpng-dev \
-    libtiff-dev
+# Usa una imagen de Docker pre-construida con DeepFace.
+FROM deepface/deepface:latest
 
 # Establece el directorio de trabajo dentro del contenedor.
 WORKDIR /app
 
-# Copia los archivos de tu proyecto al directorio de trabajo.
-COPY . .
+# Copia el archivo de requisitos.
+COPY requirements.txt .
 
 # Instala las librerías de Python desde requirements.txt.
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Copia el resto de tus archivos de proyecto.
+COPY . .
+
+# Define el comando que se ejecutará al iniciar el contenedor.
+# Es muy probable que tu app.py sea el punto de entrada.
+CMD ["python", "app.py"]
